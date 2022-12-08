@@ -1,11 +1,13 @@
 import pygame
 from Engine import Engine
 from Civil import Civil
+from Garde import Garde
 from Timer import Timer
 from Player import Player
 from Map import Map
 from EventManager import EventManager
 from ColliderManager import ColliderManager
+from PathFinding import PathFinding
 
 class Game:
     isRun:bool
@@ -27,6 +29,8 @@ class Game:
 
     colliderManager:ColliderManager
 
+    pathFinding:PathFinding
+
     def __init__(self):
         EventManager.StartListening("getScreenSize", self.GetScreenSize)
 
@@ -47,14 +51,31 @@ class Game:
         self.size = [self.width, self.height]
         self.screen = pygame.display.set_mode(self.size)
 
+        # init tout les acteur de la map et les mets dans l'engine -----------------------------------------------------------------
         self.map = Map("map", "map", "Image\\MapTP2.tmx")
-        EventManager.TriggerEnter("addActor", {"actor": self.map})
+        EventManager.TriggerEvent("addActor", {"actor": self.map})
 
-        self.player = Player("player", "player", "Image\\Player.png", "Image\\PlayerArm.png")
-        EventManager.TriggerEnter("addActor", {"actor": self.player})
+        self.pathFinding = PathFinding()
 
-        self.civil = Civil("civil", "ai", "Image\\Civil1_1.png", "Image\\Civil1_2.png")
-        EventManager.TriggerEnter("addActor", {"actor": self.civil})
+        self.player = Player("player", "player", "Image\\Player.png", "Image\\PlayerArm.png", [(64 * 7) + 32, (64 * 7) + 32], 3)
+        EventManager.TriggerEvent("addActor", {"actor": self.player})
+
+        self.civil1 = Civil("civil1", "civil", "Image\\Civil1_1.png", "Image\\Civil1_2.png", [2 * 64 + 32, 3 * 64 + 32], 1)
+        EventManager.TriggerEvent("addActor", {"actor": self.civil1})
+
+        self.civil2 = Civil("civil2", "civil", "Image\\Civil2_1.png", "Image\\Civil2_2.png", [2 * 64 + 32, 13 * 64 + 32], 1)
+        EventManager.TriggerEvent("addActor", {"actor": self.civil2})
+
+        self.civil3 = Civil("civil3", "civil", "Image\\Civil3_1.png", "Image\\Civil3_2.png", [25 * 64 + 32, 2 * 64 + 32], 1)
+        EventManager.TriggerEvent("addActor", {"actor": self.civil3})
+
+        self.garde1 = Garde("garde1", "garde", "Image\\Garde1.png", "Image\\Garde2.png", [15 * 64 + 32, 9 * 64 + 32], 4)
+        EventManager.TriggerEvent("addActor", {"actor": self.garde1})
+
+        self.garde2 = Garde("garde2", "garde", "Image\\Garde1.png", "Image\\Garde2.png", [20 * 64 + 32, 9 * 64 + 32], 4)
+        EventManager.TriggerEvent("addActor", {"actor": self.garde2})
+
+        # ----------------------------------------------------------------------------------------------------------------------
 
         self.engine.Start()
 
@@ -76,7 +97,15 @@ class Game:
                 self.isRun = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if pygame.mouse.get_pressed()[0]:
-                    pass
+                    dir = EventManager.TriggerEvent("checkColliderWithAgents", {"pos": pygame.mouse.get_pos(), "size": [1, 1]})
+                    if dir[2] != None and dir[2].type != "player":
+                        oldAgent = EventManager.TriggerEvent("getAgentConnect", None)
+                        if oldAgent != None:
+                            oldAgent.DisconnectToInterface()
+                        
+                        dir[2].ConnectToInterface()
+
+                        EventManager.TriggerEvent("initCombotBox", {"agent": dir[2]})
                 if pygame.mouse.get_pressed()[2]:
                     pass
 

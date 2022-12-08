@@ -1,5 +1,6 @@
 from abc import abstractmethod
 
+#plus haut parent des object dans le jeux
 class Actor:
     tag:str
     type:str
@@ -26,6 +27,10 @@ class Actor:
 
     @abstractmethod
     def Delete(self):
+        pass
+
+    @abstractmethod
+    def OnColliderEnter(self , dir):
         pass
 
     def GetTag(self):

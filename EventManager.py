@@ -4,7 +4,8 @@ class EventManager:
 
     def __init__(self):
         pass
-
+    
+    # commence a ecouter un evenement
     @staticmethod
     def StartListening(eventName:str, listener):
         if eventName in EventManager.eventDictionary:
@@ -12,6 +13,7 @@ class EventManager:
         else:
             EventManager.eventDictionary[eventName] = [listener]
 
+    # arrete d'ecouter un evenement
     @staticmethod
     def StopListening(eventName:str, listener):
         if eventName in EventManager.eventDictionary:
@@ -19,8 +21,9 @@ class EventManager:
             if len(EventManager.eventDictionary[eventName]) == 0:
                 EventManager.eventDictionary.pop(eventName)
 
+    #fait jouer un evenement
     @staticmethod
-    def TriggerEnter(eventName:str, parametre):
+    def TriggerEvent(eventName:str, parametre):
         returnValue = []
 
         if eventName in EventManager.eventDictionary:
